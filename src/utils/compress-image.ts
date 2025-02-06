@@ -5,26 +5,25 @@ interface CompressImageParams {
   quality?: number;
 }
 
-function convertToWebp(filename: string) {
+function convertToWebp(filename: string): string {
   const lastDotIndex = filename.lastIndexOf(".");
 
   if (lastDotIndex === -1) {
     return `${filename}.webp`;
   }
 
-  return `${filename.slice(0, lastDotIndex)}.webp`;
+  return `${filename.substring(0, lastDotIndex)}.webp`;
 }
-
 export function compressImage({
   file,
   maxWidth = Number.POSITIVE_INFINITY,
   maxHeight = Number.POSITIVE_INFINITY,
   quality = 1,
 }: CompressImageParams) {
-  const allowedFileTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+  const allowedFileTypes = ["image/jpg", "image/jpeg", "image/png", "image/webp"];
 
-  if (~allowedFileTypes.includes(file.type)) {
-    throw new Error("Image format not supported.");
+  if (!allowedFileTypes.includes(file.type)) {
+    throw new Error("Image format not supported");
   }
 
   return new Promise<File>((resolve, reject) => {
@@ -57,8 +56,7 @@ export function compressImage({
         const context = canvas.getContext("2d");
 
         if (!context) {
-          reject(new Error("Failed to get canvas context."));
-
+          reject(new Error("Failed to get canvas context"));
           return;
         }
 
@@ -68,7 +66,6 @@ export function compressImage({
           (blob) => {
             if (!blob) {
               reject(new Error("Failed to compress image."));
-
               return;
             }
 
@@ -76,7 +73,6 @@ export function compressImage({
               type: "image/webp",
               lastModified: Date.now(),
             });
-
             resolve(compressedFile);
           },
           "image/webp",
