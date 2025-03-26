@@ -1,4 +1,4 @@
-name: Deploy to S3
+name: Deploy to Vercel
 
 on:
   push:
@@ -9,7 +9,8 @@ env:
   # AWS_S3_BUCKET_STATIC: "bucket-name" # Replace with your S3 bucket name
   # AWS_S3_BUCKET_CDN: "bucket-name" # Replace with your S3 bucket name
   # SOURCE_DIST: "./dist" # Replace with the path to your build output directory
-  A: "a"
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }} # Replace with your Vercel organization ID
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }} # Replace with your Vercel project ID
 
 jobs:
   deploy:
