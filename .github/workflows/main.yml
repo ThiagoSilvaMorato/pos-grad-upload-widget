@@ -1,1 +1,54 @@
+name: Deploy to S3
 
+on:
+  push:
+    branches:
+      - invalid_branch # Replace with the branch you want to trigger the deployment on
+
+env:
+  AWS_S3_BUCKET: "bucket-name" # Replace with your S3 bucket name
+  SOURCE_DIST: "./dist" # Replace with the path to your build output directory
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Node
+        id: configure-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # Specify the Node.js version you want to use
+
+      - name: Install pnpm
+        id: install-pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9 # Specify the pnpm version you want to use
+
+      - name: Install dependencies
+        id: install-dependencies
+        run: |
+          pnpm install
+
+      - name: Build app
+        id: build-app
+        run: |
+          pnpm run build
+
+      - name: Configure AWS credentials
+        id: configure-aws
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Sync files to S3
+        id: sync-files-to-s3
+        run: |
+          aws s3 sync ${{ env.SOURCE_DIST }} s3://${{ env.AWS_S3_BUCKET }} --delete --exclude '.*git*'
