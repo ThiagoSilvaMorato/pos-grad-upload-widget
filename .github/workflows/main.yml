@@ -6,7 +6,8 @@ on:
       - invalid_branch # Replace with the branch you want to trigger the deployment on
 
 env:
-  AWS_S3_BUCKET: "bucket-name" # Replace with your S3 bucket name
+  AWS_S3_BUCKET_STATIC: "bucket-name" # Replace with your S3 bucket name
+  AWS_S3_BUCKET_CDN: "bucket-name" # Replace with your S3 bucket name
   SOURCE_DIST: "./dist" # Replace with the path to your build output directory
 
 jobs:
@@ -48,7 +49,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Sync files to S3
-        id: sync-files-to-s3
+      - name: Sync files to S3 static
+        id: sync-files-to-s3-static
         run: |
-          aws s3 sync ${{ env.SOURCE_DIST }} s3://${{ env.AWS_S3_BUCKET }} --delete --exclude '.*git*'
+          aws s3 sync ${{ env.SOURCE_DIST }} s3://${{ env.AWS_S3_BUCKET_STATIC }} --delete --exclude '.*git*'
+
+      - name: Sync files to S3 CDN
+        id: sync-files-to-s3-cdn
+        run: |
+          aws s3 sync ${{ env.SOURCE_DIST }} s3://${{ env.AWS_S3_BUCKET_CDN }} --delete --exclude '.*git*'
